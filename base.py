@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas.core.base import PandasObject
 from datetime import datetime, timedelta
-from typing import List, Dict, Union, Tuple
+from typing import List, Dict, Union
 from icecream import ic as print
 import yfinance as yf
 import numpy as np
@@ -256,7 +256,7 @@ PandasObject.find_levels = find_levels
 
 def stock_data(
     yf_params: Dict, strategy_params: Dict, level_params: Dict
-) -> Union[Tuple[pd.DataFrame, pd.DataFrame], None]:
+) -> Union[Dict, None]:
     try:
         df = yf.download(**yf_params)
         df = df.clean()
@@ -266,8 +266,8 @@ def stock_data(
     except Exception as e:
         print(f"Exception raised while trying to obtain data : {e}")
     else:
-        # Should have returned valid output
-        return (df, levels)
+        # Should return valid output
+        return {"df": df, "levels": levels}
     # In case something goes wrong, will return None
     return None
 
@@ -297,5 +297,5 @@ if __name__ == "__main__":
         "period": 15,
     }
 
-    df, levels = stock_data(yf_params, strategy_params, level_params)
-    print(levels)
+    data = stock_data(yf_params, strategy_params, level_params)
+    print(data["levels"])
