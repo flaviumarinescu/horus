@@ -21,3 +21,4 @@ For help :
       --long l     long timeframe
       --levels lv  how long should sr levels be (in number of days)
 
+Tested with python version 3.7.4
