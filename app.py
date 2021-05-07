@@ -1,12 +1,18 @@
 import finplot as fplt
 from base import stock_data
-import pandas as pd
 from datetime import datetime, timedelta
-from typing import List
 
 
-def update_plot(df: pd.DataFrame, levels: pd.DataFrame, contexts: List[str]):
+def update_plot():
     now = datetime.now()
+
+    global yf_params, strategy_params, level_params
+    data = stock_data(yf_params, strategy_params, level_params)
+
+    if not data:
+        return
+    else:
+        df, levels, contexts = data["df"], data["levels"], strategy_params["contexts"]
 
     if not plots:
         # first time we create the plots
@@ -215,12 +221,9 @@ if __name__ == "__main__":
         "period": args.levels,
     }
 
-    data = stock_data(yf_params, strategy_params, level_params)
+    plots = {}
+    ax = fplt.create_plot(yf_params["tickers"], rows=1, yscale="liniar")
 
-    if data:
-        plots = {}
-        ax = fplt.create_plot(yf_params["tickers"], rows=1, yscale="liniar")
-
-        update_plot(data["df"], data["levels"], contexts=strategy_params["contexts"])
-        fplt.timer_callback(update_plot, 30)
-        fplt.show()
+    update_plot()
+    fplt.timer_callback(update_plot, 10)
+    fplt.show()
