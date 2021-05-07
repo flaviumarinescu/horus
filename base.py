@@ -95,7 +95,6 @@ def strategy89(df: pd.DataFrame, contexts: List[str]) -> pd.DataFrame:
             .rolling(window=89)
             .mean()
         )
-        print(sma)
         sma.name = f"sma_{context}"
         df = pd.merge(df, sma, how="left", left_index=True, right_index=True)
         df[sma.name].fillna(method="ffill", inplace=True)
