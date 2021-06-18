@@ -1,6 +1,6 @@
 # Gather data from yfinance, analyse data, add technical analysis & plot
 
-Using yahoo finance as data provider. Can be integrated with any provider my modifying base.py -> stock_data().
+Can be integrated with any provider by modifying base.py -> stock_data().
 
 Running example :
 
