@@ -1,6 +1,7 @@
 # Gather data from yfinance, analyse data, add technical analysis & plot
 
 Can be integrated with any provider by modifying base.py -> stock_data().
+Since data is gathered using yfinance, Ticker input must be in yahoo finance style : eurusd=x, eth-usd, gc=f ...
 
 Running example :
 
