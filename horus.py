@@ -20,24 +20,26 @@ class HorusApp(qtw.QMainWindow):
         super().__init__(*args, **kwargs)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.TickerInput.setFocus()
         self.setWindowTitle("Horus")
         self.setWindowIcon(QIcon("logo.jpg"))
-        self.myconfig = Config()
 
+        self.myconfig = Config()
         self.yf_params = {}
         self.strategy_params = {}
         self.level_params = {}
-
         self.plots = []
+
         self.ax = fplt.create_plot(init_zoom_periods=100, maximize=False)
         self.axs = [self.ax]  # finplot requires this property
         self.axo = self.ax.overlay()
         self.ui.gridLayout.addWidget(self.ax.vb.win, 1, 0)
         fplt.show(qt_exec=False)
 
-        self.show()
         self.ui.TickerInput.returnPressed.connect(self.return_pressed)
         self.ui.LockUnlock.clicked.connect(self.freeze_form)
+
+        self.show()
 
     @qtc.pyqtSlot(bool)
     def freeze_form(self):
