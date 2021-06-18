@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import pandas as pd
 from pandas.core.base import PandasObject
 from datetime import datetime, timedelta
