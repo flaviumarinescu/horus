@@ -29,6 +29,30 @@ except Exception as e:
     print(f"Talib not found, do not call candles function : {e}")
 
 
+yf_params = {
+    "tickers": "eurusd=x",
+    "start": datetime.now() - timedelta(days=70),
+    "end": datetime.now() - timedelta(days=1),
+    "interval": "60m",
+    "rounding": False,
+    "prepost": False,
+    "progress": False,
+    "group_by": "ticker",
+}
+
+strategy_params = {
+    "contexts": ["2h", "4h"],
+}
+
+level_params = {
+    "thickness": 0.007,
+    "spacing": 1,
+    "type": "filtered",
+    "timeframe": "2h",
+    "period": 15,
+}
+
+
 def clean(df: pd.DataFrame, dropna: str = "any") -> pd.DataFrame:
     """
     df :       pd.DataFrame
@@ -101,7 +125,6 @@ def strategy89(df: pd.DataFrame, contexts: List[str]) -> pd.DataFrame:
 
     df["sma_interval"] = df.close.rolling(window=89).mean()
     df["sma_9"] = df.close.rolling(window=9).mean()
-    df.dropna(inplace=True)
 
     if not df.empty:
         return df
@@ -212,8 +235,10 @@ def find_levels(
         for i in range(2, df.shape[0] - 2):
             if isSupport(df, i):
                 levels.append((i, df["low"][i]))
+                mirror.append((i, df["low"][i], "s"))
             elif isResistance(df, i):
                 levels.append((i, df["high"][i]))
+                mirror.append((i, df["high"][i], "r"))
     elif type == "filtered":
         s = np.mean(df["high"] - df["low"]) / spacing
         for i in range(2, df.shape[0] - 2):
@@ -221,7 +246,7 @@ def find_levels(
                 l = df["low"][i]
                 if isFarFromLevel(l, s):
                     levels.append((i, l))
-                    mirror.append((i, l, "s"))  # am adaugat astea..
+                    mirror.append((i, l, "s"))
             elif isResistance(df, i):
                 l = df["high"][i]
                 if isFarFromLevel(l, s):
@@ -272,29 +297,5 @@ def stock_data(
 
 
 if __name__ == "__main__":
-
-    yf_params = {
-        "tickers": "eurusd=x",
-        "start": datetime.now() - timedelta(days=70),
-        "end": datetime.now() - timedelta(days=1),
-        "interval": "60m",
-        "rounding": False,
-        "prepost": False,
-        "progress": False,
-        "group_by": "ticker",
-    }
-
-    strategy_params = {
-        "contexts": ["2h", "4h"],
-    }
-
-    level_params = {
-        "thickness": 0.007,
-        "spacing": 1,
-        "type": "filtered",
-        "timeframe": "2h",
-        "period": 15,
-    }
-
     data = stock_data(yf_params, strategy_params, level_params)
     print(data["levels"])
