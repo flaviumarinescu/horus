@@ -1,4 +1,4 @@
-finplot==1.6
+finplot==1.7
 pandas==1.2.2
 icecream==2.0.0
 numpy==1.20.1
