@@ -3,7 +3,7 @@
 
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
-from MainWindow import Ui_MainWindow
+from MainWindow import Ui_MainWindow  # type: ignore
 from PyQt5.QtGui import QIcon
 
 import finplot as fplt
@@ -11,7 +11,7 @@ import pickle
 from typing import Dict, Union
 import os
 from datetime import datetime, timedelta
-from base import stock_data
+from base import stock_data  # type: ignore
 from icecream import ic as print
 
 
@@ -31,7 +31,7 @@ class HorusApp(qtw.QMainWindow):
 
         self.plots = []
         self.customize_fplt()
-        self.ax = fplt.create_plot(init_zoom_periods=100, maximize=False)
+        self.ax = fplt.create_plot(init_zoom_periods=200, maximize=False)
         self.ax.showGrid(True, True)
         self.axs = [self.ax]  # finplot requires this property
         self.axo = self.ax.overlay()
@@ -85,6 +85,15 @@ class HorusApp(qtw.QMainWindow):
             self.ui.LockUnlock.setChecked(True)
             self.freeze_form()
             fplt.timer_callback(self.update, refresh)
+
+    def keyPressEvent(self, e):
+        if e.key() == qtc.Qt.Key_Escape:
+            self.close()
+        if e.key() == qtc.Qt.Key_F11:
+            if self.isMaximized():
+                self.showNormal()
+            else:
+                self.showMaximized()
 
     def extract_form_data(self) -> Dict:
         return {
