@@ -89,7 +89,11 @@ def clean(df: pd.DataFrame, dropna: str = "any") -> pd.DataFrame:
     df = df.reindex(columns=["open", "high", "low", "close", "volume"])
 
     if not df.empty:
-        return df
+        i = df.index[-1].time()  # since data is from yahoo finance... we need to adapt
+        if not (i.second == 0 and (i.minute == 30 or i.minute == 0)):
+            return df[:-1]
+        else:
+            return df
     else:
         raise Exception("DataFrame came empty")
 

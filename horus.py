@@ -174,7 +174,16 @@ class HorusApp(qtw.QMainWindow):
         }
 
     def update(self):
-        data = stock_data(self.yf_params, self.strategy_params, self.level_params)
+        data = stock_data(
+            {
+                **self.yf_params,
+                **{
+                    "end": datetime.now(),
+                },
+            },
+            self.strategy_params,
+            self.level_params,
+        )
         if not data:
             qtw.QMessageBox.critical(
                 self,
@@ -188,7 +197,6 @@ class HorusApp(qtw.QMainWindow):
             self.strategy_params["contexts"],
         )
         self.setWindowTitle(self.yf_params["tickers"])
-
         if not self.plots:
             self.ax.reset()  # remove previous plots
             self.axo.reset()  # remove previous plots
