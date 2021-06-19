@@ -215,7 +215,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.ControlTabWidged.setCurrentIndex(1)
+        self.ControlTabWidged.setCurrentIndex(0)
         self.TimeframeComboContext.setCurrentIndex(3)
         self.MediumTimeframeCombo.setCurrentIndex(5)
         self.LongTimeframeCombo.setCurrentIndex(5)
