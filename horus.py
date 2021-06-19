@@ -28,9 +28,11 @@ class HorusApp(qtw.QMainWindow):
         self.yf_params = {}
         self.strategy_params = {}
         self.level_params = {}
-        self.plots = []
 
+        self.plots = []
+        self.customize_fplt()
         self.ax = fplt.create_plot(init_zoom_periods=100, maximize=False)
+        self.ax.showGrid(True, True)
         self.axs = [self.ax]  # finplot requires this property
         self.axo = self.ax.overlay()
         self.ui.gridLayout.addWidget(self.ax.vb.win, 1, 0)
@@ -361,6 +363,21 @@ class HorusApp(qtw.QMainWindow):
                     x, len(x) * [row.end], ax=self.ax, color="#00fff966", width=4.5
                 )
         # fplt.refresh()  # refresh autoscaling when all plots complete
+
+    def customize_fplt(self):
+        fplt.legend_border_color = "#000000dd"
+        fplt.legend_fill_color = "#00000055"
+        fplt.legend_text_color = "#dddddd66"
+        fplt.foreground = "#eef"
+        fplt.background = "#000000"
+        fplt.odd_plot_background = "#f0f0f0"
+        fplt.poc_color = "#000060"
+        fplt.cross_hair_color = "#ffffff"
+        fplt.draw_line_color = "#ffffff"
+        fplt.draw_done_color = "#ffffff"
+        fplt.clamp_grid = False
+        fplt.significant_decimals = 5
+        fplt.significant_eps = 1e-5
 
 
 class Config:
