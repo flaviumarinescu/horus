@@ -45,7 +45,7 @@ class HorusApp(qtw.QMainWindow):
 
     @qtc.pyqtSlot(bool)
     def freeze_form(self):
-        if not self.ui.TickerInput.text():
+        if not self.ui.TickerInput.text().upper():
             qtw.QMessageBox.critical(
                 self,
                 "Error",
@@ -60,11 +60,11 @@ class HorusApp(qtw.QMainWindow):
         else:
             self.ui.ContextTab.setEnabled(True)
             self.ui.LevelsTab.setEnabled(True)
-            self.myconfig.remove(self.ui.TickerInput.text())
+            self.myconfig.remove(self.ui.TickerInput.text().upper())
 
     @qtc.pyqtSlot()
     def return_pressed(self):
-        ticker = self.ui.TickerInput.text()
+        ticker = self.ui.TickerInput.text().upper()
         if not ticker:
             qtw.QMessageBox.critical(
                 self,
@@ -74,7 +74,15 @@ class HorusApp(qtw.QMainWindow):
             return
 
         if ticker in self.myconfig.data:
-            self.config_to_form(ticker)
+            dlg = qtw.QMessageBox(self)
+            dlg.setWindowTitle(f"Question")
+            dlg.setText(f"Load stored config for {ticker}?")
+            dlg.setStandardButtons(qtw.QMessageBox.Yes | qtw.QMessageBox.No)
+            dlg.setIcon(qtw.QMessageBox.Question)
+            button = dlg.exec_()
+
+            if button == qtw.QMessageBox.Yes:
+                self.config_to_form(ticker)
 
         self.plots = []
         self.process_form(ticker)
@@ -97,7 +105,7 @@ class HorusApp(qtw.QMainWindow):
 
     def extract_form_data(self) -> Dict:
         return {
-            self.ui.TickerInput.text(): {
+            self.ui.TickerInput.text().upper(): {
                 "refresh": int(self.ui.RefreshSpin.value()),
                 "context": {
                     "timeframe": self.ui.TimeframeComboContext.currentText(),
@@ -257,30 +265,32 @@ class HorusApp(qtw.QMainWindow):
             try:
                 if len(contexts):
                     # medium +  # plots[5]
-                    self.plots.append(
-                        fplt.plot(
-                            df[df.close >= df[f"sma_{contexts[0]}"]][
-                                f"sma_{contexts[0]}"
-                            ],
-                            ax=self.ax,
-                            legend="medium_trend",
-                            width=4,
-                            style=".",
-                            color="#00ff1eB3",
+                    temp = df[df.close >= df[f"sma_{contexts[0]}"]][
+                        f"sma_{contexts[0]}"
+                    ]
+                    if not temp.empty:
+                        self.plots.append(
+                            fplt.plot(
+                                temp,
+                                ax=self.ax,
+                                legend="medium_trend",
+                                width=4,
+                                style=".",
+                                color="#00ff1eB3",
+                            )
                         )
-                    )
                     # medium -  # plots[6]
-                    self.plots.append(
-                        fplt.plot(
-                            df[df.close < df[f"sma_{contexts[0]}"]][
-                                f"sma_{contexts[0]}"
-                            ],
-                            ax=self.ax,
-                            width=4,
-                            style=".",
-                            color="#d00000B3",
+                    temp = df[df.close < df[f"sma_{contexts[0]}"]][f"sma_{contexts[0]}"]
+                    if not temp.empty:
+                        self.plots.append(
+                            fplt.plot(
+                                temp,
+                                ax=self.ax,
+                                width=4,
+                                style=".",
+                                color="#d00000B3",
+                            )
                         )
-                    )
             except IndexError:
                 qtw.QMessageBox.information(
                     self,
@@ -295,30 +305,32 @@ class HorusApp(qtw.QMainWindow):
             try:
                 if len(contexts) == 2:
                     # long +  # plots[7]
-                    self.plots.append(
-                        fplt.plot(
-                            df[df.close >= df[f"sma_{contexts[1]}"]][
-                                f"sma_{contexts[1]}"
-                            ],
-                            ax=self.ax,
-                            legend="long_trend",
-                            width=7,
-                            style=".",
-                            color="#00ff1e80",
+                    temp = df[df.close >= df[f"sma_{contexts[1]}"]][
+                        f"sma_{contexts[1]}"
+                    ]
+                    if not temp.empty:
+                        self.plots.append(
+                            fplt.plot(
+                                temp,
+                                ax=self.ax,
+                                legend="long_trend",
+                                width=7,
+                                style=".",
+                                color="#00ff1e80",
+                            )
                         )
-                    )
                     # long   # plots[8]
-                    self.plots.append(
-                        fplt.plot(
-                            df[df.close < df[f"sma_{contexts[1]}"]][
-                                f"sma_{contexts[1]}"
-                            ],
-                            ax=self.ax,
-                            width=7,
-                            style=".",
-                            color="#d0000080",
+                    temp = df[df.close < df[f"sma_{contexts[1]}"]][f"sma_{contexts[1]}"]
+                    if not temp.empty:
+                        self.plots.append(
+                            fplt.plot(
+                                temp,
+                                ax=self.ax,
+                                width=7,
+                                style=".",
+                                color="#d0000080",
+                            )
                         )
-                    )
             except IndexError:
                 qtw.QMessageBox.information(
                     self,
@@ -345,24 +357,27 @@ class HorusApp(qtw.QMainWindow):
 
             try:
                 if len(contexts):
-                    self.plots[5].update_data(
-                        df[df.close >= df[f"sma_{contexts[0]}"]][f"sma_{contexts[0]}"]
-                    )
-                    self.plots[6].update_data(
-                        df[df.close < df[f"sma_{contexts[0]}"]][f"sma_{contexts[0]}"]
-                    )
+                    temp = df[df.close >= df[f"sma_{contexts[0]}"]][
+                        f"sma_{contexts[0]}"
+                    ]
+                    if not temp.empty:
+                        self.plots[5].update_data(temp)
+                    temp = df[df.close < df[f"sma_{contexts[0]}"]][f"sma_{contexts[0]}"]
+                    if not temp.empty:
+                        self.plots[6].update_data(temp)
             except Exception as e:
                 print("Error", f"Error : {e}")
 
             try:
                 if len(contexts) == 2:
-                    self.plots[7].update_data(
-                        df[df.close >= df[f"sma_{contexts[1]}"]][f"sma_{contexts[1]}"]
-                    )
-
-                    self.plots[8].update_data(
-                        df[df.close < df[f"sma_{contexts[1]}"]][f"sma_{contexts[1]}"]
-                    )
+                    temp = df[df.close >= df[f"sma_{contexts[1]}"]][
+                        f"sma_{contexts[1]}"
+                    ]
+                    if not temp.empty:
+                        self.plots[7].update_data(temp)
+                    temp = df[df.close < df[f"sma_{contexts[1]}"]][f"sma_{contexts[1]}"]
+                    if not temp.empty:
+                        self.plots[8].update_data(temp)
             except Exception as e:
                 print("Error", f"Error : {e}")
 
@@ -452,8 +467,10 @@ def apply_style(app):
 
 
 if __name__ == "__main__":
-    app = qtw.QApplication([])
+    import sys
+
+    app = qtw.QApplication(sys.argv)
     app = apply_style(app)
     window = HorusApp()
     window.show()
-    app.exec_()
+    sys.exit(app.exec_())
