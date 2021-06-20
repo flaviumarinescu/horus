@@ -130,6 +130,9 @@
               <property name="statusTip">
                <string>How often should graph be refreshed. 0 to disable</string>
               </property>
+              <property name="maximum">
+               <number>3600</number>
+              </property>
              </widget>
             </item>
             <item alignment="Qt::AlignLeft|Qt::AlignVCenter">

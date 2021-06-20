@@ -58,6 +58,7 @@ class Ui_MainWindow(object):
         self.RefreshLabel.setObjectName("RefreshLabel")
         self.Market_horizontalLayout.addWidget(self.RefreshLabel, 0, QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.RefreshSpin = QtWidgets.QSpinBox(self.MarketTab)
+        self.RefreshSpin.setMaximum(3600)
         self.RefreshSpin.setObjectName("RefreshSpin")
         self.Market_horizontalLayout.addWidget(self.RefreshSpin, 0, QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.LockUnlock = QtWidgets.QRadioButton(self.MarketTab)

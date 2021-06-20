@@ -74,15 +74,7 @@ class HorusApp(qtw.QMainWindow):
             return
 
         if ticker in self.myconfig.data:
-            dlg = qtw.QMessageBox(self)
-            dlg.setWindowTitle(f"Question")
-            dlg.setText(f"Load stored config for {ticker}?")
-            dlg.setStandardButtons(qtw.QMessageBox.Yes | qtw.QMessageBox.No)
-            dlg.setIcon(qtw.QMessageBox.Question)
-            button = dlg.exec_()
-
-            if button == qtw.QMessageBox.Yes:
-                self.config_to_form(ticker)
+            self.config_to_form(ticker)
 
         self.plots = []
         self.process_form(ticker)
