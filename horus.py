@@ -46,9 +46,10 @@ class HorusApp(qtw.QMainWindow):
 
     @qtc.pyqtSlot(str)
     def input_edit_unfreeze(self):
-        self.ui.LockUnlock.setChecked(False)
-        self.ui.ContextTab.setEnabled(True)
-        self.ui.LevelsTab.setEnabled(True)
+        if self.ui.LockUnlock.isChecked():
+            self.ui.LockUnlock.setChecked(False)
+            self.ui.ContextTab.setEnabled(True)
+            self.ui.LevelsTab.setEnabled(True)
 
     @qtc.pyqtSlot(bool)
     def freeze_form(self):
