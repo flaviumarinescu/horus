@@ -40,13 +40,20 @@ class HorusApp(qtw.QMainWindow):
 
         self.ui.TickerInput.returnPressed.connect(self.return_pressed)
         self.ui.LockUnlock.clicked.connect(self.freeze_form)
+        self.ui.TickerInput.textChanged.connect(self.input_edit_unfreeze)
 
         self.show()
+
+    @qtc.pyqtSlot(str)
+    def input_edit_unfreeze(self):
+        self.ui.LockUnlock.setChecked(False)
+        self.ui.ContextTab.setEnabled(True)
+        self.ui.LevelsTab.setEnabled(True)
 
     @qtc.pyqtSlot(bool)
     def freeze_form(self):
         if not self.ui.TickerInput.text().upper():
-            qtw.QMessageBox.critical(
+            self.dialog = qtw.QMessageBox.critical(
                 self,
                 "Error",
                 "Please provide a ticker",
@@ -66,7 +73,7 @@ class HorusApp(qtw.QMainWindow):
     def return_pressed(self):
         ticker = self.ui.TickerInput.text().upper()
         if not ticker:
-            qtw.QMessageBox.critical(
+            self.dialog = qtw.QMessageBox.critical(
                 self,
                 "Error",
                 "Please provide a ticker",
@@ -185,7 +192,7 @@ class HorusApp(qtw.QMainWindow):
             self.level_params,
         )
         if not data:
-            qtw.QMessageBox.critical(
+            self.dialog = qtw.QMessageBox.critical(
                 self,
                 "Error",
                 "Request returned empty, please check input params or provider",
@@ -284,7 +291,7 @@ class HorusApp(qtw.QMainWindow):
                             )
                         )
             except IndexError:
-                qtw.QMessageBox.information(
+                self.dialog = qtw.QMessageBox.information(
                     self,
                     "Info",
                     "Could not generate sma for higher timeframe."
@@ -292,7 +299,7 @@ class HorusApp(qtw.QMainWindow):
                     "Secondly, check if the above period has enough data to generate 89 sma",
                 )
             except Exception as e:
-                qtw.QMessageBox.critical(self, "Error", f"Error : {e}")
+                self.dialog = qtw.QMessageBox.critical(self, "Error", f"Error : {e}")
 
             try:
                 if len(contexts) == 2:
@@ -324,7 +331,7 @@ class HorusApp(qtw.QMainWindow):
                             )
                         )
             except IndexError:
-                qtw.QMessageBox.information(
+                self.dialog = qtw.QMessageBox.information(
                     self,
                     "Info",
                     "Could not generate sma for higher timeframe."
@@ -332,7 +339,7 @@ class HorusApp(qtw.QMainWindow):
                     "Secondly, check if the above period has enough data to generate 89 sma",
                 )
             except Exception as e:
-                qtw.QMessageBox.critical(self, "Error", f"Error : {e}")
+                self.dialog = qtw.QMessageBox.critical(self, "Error", f"Error : {e}")
 
             fplt.refresh()  # refresh autoscaling when all plots complete
 
@@ -440,7 +447,7 @@ def apply_style(app):
     dark_palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
     dark_palette.setColor(QPalette.ToolTipBase, QColor(25, 25, 25))
     dark_palette.setColor(QPalette.ToolTipText, QColor(212, 175, 55))  # Qt.white
-    dark_palette.setColor(QPalette.Text, QColor(212, 175, 55))  #  Qt.white
+    dark_palette.setColor(QPalette.Text, QColor(212, 175, 55))  # Qt.white
     dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
     dark_palette.setColor(QPalette.ButtonText, QColor(212, 175, 55))
     dark_palette.setColor(QPalette.BrightText, Qt.red)

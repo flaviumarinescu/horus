@@ -42,7 +42,9 @@ class Ui_MainWindow(object):
         self.Market_horizontalLayout.setObjectName("Market_horizontalLayout")
         self.TickerLabel = QtWidgets.QLabel(self.MarketTab)
         self.TickerLabel.setObjectName("TickerLabel")
-        self.Market_horizontalLayout.addWidget(self.TickerLabel, 0, QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.Market_horizontalLayout.addWidget(
+            self.TickerLabel, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
         self.TickerInput = QtWidgets.QLineEdit(self.MarketTab)
         self.TickerInput.setEnabled(True)
         self.TickerInput.setToolTip("")
@@ -56,16 +58,22 @@ class Ui_MainWindow(object):
         self.Market_horizontalLayout.addWidget(self.TickerInput)
         self.RefreshLabel = QtWidgets.QLabel(self.MarketTab)
         self.RefreshLabel.setObjectName("RefreshLabel")
-        self.Market_horizontalLayout.addWidget(self.RefreshLabel, 0, QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.Market_horizontalLayout.addWidget(
+            self.RefreshLabel, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
         self.RefreshSpin = QtWidgets.QSpinBox(self.MarketTab)
         self.RefreshSpin.setMaximum(3600)
         self.RefreshSpin.setObjectName("RefreshSpin")
-        self.Market_horizontalLayout.addWidget(self.RefreshSpin, 0, QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.Market_horizontalLayout.addWidget(
+            self.RefreshSpin, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+        )
         self.LockUnlock = QtWidgets.QRadioButton(self.MarketTab)
         self.LockUnlock.setEnabled(True)
         self.LockUnlock.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.LockUnlock.setObjectName("LockUnlock")
-        self.Market_horizontalLayout.addWidget(self.LockUnlock, 0, QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.Market_horizontalLayout.addWidget(
+            self.LockUnlock, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
         self.horizontalLayout_2.addLayout(self.Market_horizontalLayout)
         self.ControlTabWidged.addTab(self.MarketTab, "")
         self.ContextTab = QtWidgets.QWidget()
@@ -78,28 +86,38 @@ class Ui_MainWindow(object):
         self.TimeframeLabelContext = QtWidgets.QLabel(self.ContextTab)
         self.TimeframeLabelContext.setMaximumSize(QtCore.QSize(81, 16777215))
         self.TimeframeLabelContext.setObjectName("TimeframeLabelContext")
-        self.Context_horizontalLayout.addWidget(self.TimeframeLabelContext, 0, QtCore.Qt.AlignVCenter)
+        self.Context_horizontalLayout.addWidget(
+            self.TimeframeLabelContext, 0, QtCore.Qt.AlignVCenter
+        )
         self.TimeframeComboContext = QtWidgets.QComboBox(self.ContextTab)
         self.TimeframeComboContext.setObjectName("TimeframeComboContext")
         self.TimeframeComboContext.addItem("")
         self.TimeframeComboContext.addItem("")
         self.TimeframeComboContext.addItem("")
         self.TimeframeComboContext.addItem("")
-        self.Context_horizontalLayout.addWidget(self.TimeframeComboContext, 0, QtCore.Qt.AlignVCenter)
+        self.Context_horizontalLayout.addWidget(
+            self.TimeframeComboContext, 0, QtCore.Qt.AlignVCenter
+        )
         self.PeriodLabelContext = QtWidgets.QLabel(self.ContextTab)
         self.PeriodLabelContext.setMaximumSize(QtCore.QSize(52, 16777215))
         self.PeriodLabelContext.setObjectName("PeriodLabelContext")
-        self.Context_horizontalLayout.addWidget(self.PeriodLabelContext, 0, QtCore.Qt.AlignVCenter)
+        self.Context_horizontalLayout.addWidget(
+            self.PeriodLabelContext, 0, QtCore.Qt.AlignVCenter
+        )
         self.PeriodSpinContext = QtWidgets.QSpinBox(self.ContextTab)
         self.PeriodSpinContext.setMinimum(1)
         self.PeriodSpinContext.setMaximum(999)
         self.PeriodSpinContext.setProperty("value", 59)
         self.PeriodSpinContext.setObjectName("PeriodSpinContext")
-        self.Context_horizontalLayout.addWidget(self.PeriodSpinContext, 0, QtCore.Qt.AlignVCenter)
+        self.Context_horizontalLayout.addWidget(
+            self.PeriodSpinContext, 0, QtCore.Qt.AlignVCenter
+        )
         self.MediumTimeframeLabel = QtWidgets.QLabel(self.ContextTab)
         self.MediumTimeframeLabel.setMaximumSize(QtCore.QSize(60, 16777215))
         self.MediumTimeframeLabel.setObjectName("MediumTimeframeLabel")
-        self.Context_horizontalLayout.addWidget(self.MediumTimeframeLabel, 0, QtCore.Qt.AlignVCenter)
+        self.Context_horizontalLayout.addWidget(
+            self.MediumTimeframeLabel, 0, QtCore.Qt.AlignVCenter
+        )
         self.MediumTimeframeCombo = QtWidgets.QComboBox(self.ContextTab)
         self.MediumTimeframeCombo.setEnabled(True)
         self.MediumTimeframeCombo.setMaxCount(10)
@@ -112,11 +130,15 @@ class Ui_MainWindow(object):
         self.MediumTimeframeCombo.addItem("")
         self.MediumTimeframeCombo.addItem("")
         self.MediumTimeframeCombo.addItem("")
-        self.Context_horizontalLayout.addWidget(self.MediumTimeframeCombo, 0, QtCore.Qt.AlignVCenter)
+        self.Context_horizontalLayout.addWidget(
+            self.MediumTimeframeCombo, 0, QtCore.Qt.AlignVCenter
+        )
         self.LongTimeframeLabel = QtWidgets.QLabel(self.ContextTab)
         self.LongTimeframeLabel.setMaximumSize(QtCore.QSize(42, 16777215))
         self.LongTimeframeLabel.setObjectName("LongTimeframeLabel")
-        self.Context_horizontalLayout.addWidget(self.LongTimeframeLabel, 0, QtCore.Qt.AlignVCenter)
+        self.Context_horizontalLayout.addWidget(
+            self.LongTimeframeLabel, 0, QtCore.Qt.AlignVCenter
+        )
         self.LongTimeframeCombo = QtWidgets.QComboBox(self.ContextTab)
         self.LongTimeframeCombo.setMaxCount(10)
         self.LongTimeframeCombo.setObjectName("LongTimeframeCombo")
@@ -129,7 +151,9 @@ class Ui_MainWindow(object):
         self.LongTimeframeCombo.addItem("")
         self.LongTimeframeCombo.addItem("")
         self.LongTimeframeCombo.addItem("")
-        self.Context_horizontalLayout.addWidget(self.LongTimeframeCombo, 0, QtCore.Qt.AlignVCenter)
+        self.Context_horizontalLayout.addWidget(
+            self.LongTimeframeCombo, 0, QtCore.Qt.AlignVCenter
+        )
         self.horizontalLayout_4.addLayout(self.Context_horizontalLayout)
         self.ControlTabWidged.addTab(self.ContextTab, "")
         self.LevelsTab = QtWidgets.QWidget()
@@ -227,24 +251,55 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.TickerLabel.setText(_translate("MainWindow", "Ticker"))
-        self.TickerInput.setStatusTip(_translate("MainWindow", "Market name. All modifications from Context & Levels will take effect only AFTER PRESSING ENTER on this field."))
-        self.TickerInput.setPlaceholderText(_translate("MainWindow", "Write ticker and press enter "))
+        self.TickerInput.setStatusTip(
+            _translate(
+                "MainWindow",
+                "Market name. All modifications from Context & Levels will take effect only AFTER PRESSING ENTER on this field.",
+            )
+        )
+        self.TickerInput.setPlaceholderText(
+            _translate("MainWindow", "Write ticker and press enter ")
+        )
         self.RefreshLabel.setText(_translate("MainWindow", "Refresh (seconds)"))
-        self.RefreshSpin.setStatusTip(_translate("MainWindow", "How often should graph be refreshed. 0 to disable"))
-        self.LockUnlock.setStatusTip(_translate("MainWindow", "If enabled, locks and saves all Context and Levels settings for this ticker."))
+        self.RefreshSpin.setStatusTip(
+            _translate(
+                "MainWindow", "How often should graph be refreshed. 0 to disable"
+            )
+        )
+        self.LockUnlock.setStatusTip(
+            _translate(
+                "MainWindow",
+                "If enabled, locks and saves all Context and Levels settings for this ticker.",
+            )
+        )
         self.LockUnlock.setText(_translate("MainWindow", "Lock/Unlock"))
-        self.ControlTabWidged.setTabText(self.ControlTabWidged.indexOf(self.MarketTab), _translate("MainWindow", "Market"))
+        self.ControlTabWidged.setTabText(
+            self.ControlTabWidged.indexOf(self.MarketTab),
+            _translate("MainWindow", "Market"),
+        )
         self.TimeframeLabelContext.setText(_translate("MainWindow", "Timeframe"))
-        self.TimeframeComboContext.setStatusTip(_translate("MainWindow", "Downloaded data timeframe from provider."))
+        self.TimeframeComboContext.setStatusTip(
+            _translate("MainWindow", "Downloaded data timeframe from provider.")
+        )
         self.TimeframeComboContext.setCurrentText(_translate("MainWindow", "60m"))
         self.TimeframeComboContext.setItemText(0, _translate("MainWindow", "1m"))
         self.TimeframeComboContext.setItemText(1, _translate("MainWindow", "5m"))
         self.TimeframeComboContext.setItemText(2, _translate("MainWindow", "15m"))
         self.TimeframeComboContext.setItemText(3, _translate("MainWindow", "60m"))
         self.PeriodLabelContext.setText(_translate("MainWindow", "Period"))
-        self.PeriodSpinContext.setStatusTip(_translate("MainWindow", "How many days to download from provider. Careful with provider."))
+        self.PeriodSpinContext.setStatusTip(
+            _translate(
+                "MainWindow",
+                "How many days to download from provider. Careful with provider.",
+            )
+        )
         self.MediumTimeframeLabel.setText(_translate("MainWindow", "Medium"))
-        self.MediumTimeframeCombo.setStatusTip(_translate("MainWindow", "Medium timeframe - should be 2-4x previous. Must be compatible with pandas resample function."))
+        self.MediumTimeframeCombo.setStatusTip(
+            _translate(
+                "MainWindow",
+                "Medium timeframe - should be 2-4x previous. Must be compatible with pandas resample function.",
+            )
+        )
         self.MediumTimeframeCombo.setCurrentText(_translate("MainWindow", "2h"))
         self.MediumTimeframeCombo.setItemText(0, _translate("MainWindow", "off"))
         self.MediumTimeframeCombo.setItemText(1, _translate("MainWindow", "5min"))
@@ -255,7 +310,12 @@ class Ui_MainWindow(object):
         self.MediumTimeframeCombo.setItemText(6, _translate("MainWindow", "3h"))
         self.MediumTimeframeCombo.setItemText(7, _translate("MainWindow", "4h"))
         self.LongTimeframeLabel.setText(_translate("MainWindow", "Long"))
-        self.LongTimeframeCombo.setStatusTip(_translate("MainWindow", "Long timeframe - should be 2-4x previous. Must be compatible with pandas resample function."))
+        self.LongTimeframeCombo.setStatusTip(
+            _translate(
+                "MainWindow",
+                "Long timeframe - should be 2-4x previous. Must be compatible with pandas resample function.",
+            )
+        )
         self.LongTimeframeCombo.setCurrentText(_translate("MainWindow", "3h"))
         self.LongTimeframeCombo.setItemText(0, _translate("MainWindow", "off"))
         self.LongTimeframeCombo.setItemText(1, _translate("MainWindow", "15min"))
@@ -266,11 +326,24 @@ class Ui_MainWindow(object):
         self.LongTimeframeCombo.setItemText(6, _translate("MainWindow", "4h"))
         self.LongTimeframeCombo.setItemText(7, _translate("MainWindow", "8h"))
         self.LongTimeframeCombo.setItemText(8, _translate("MainWindow", "1d"))
-        self.ControlTabWidged.setTabText(self.ControlTabWidged.indexOf(self.ContextTab), _translate("MainWindow", "Context"))
+        self.ControlTabWidged.setTabText(
+            self.ControlTabWidged.indexOf(self.ContextTab),
+            _translate("MainWindow", "Context"),
+        )
         self.PeriodLabelLevels.setText(_translate("MainWindow", "Period"))
-        self.PeriodSpinLevels.setStatusTip(_translate("MainWindow", "Counting backwards, how many days to consider. 0 to disable"))
+        self.PeriodSpinLevels.setStatusTip(
+            _translate(
+                "MainWindow",
+                "Counting backwards, how many days to consider. 0 to disable",
+            )
+        )
         self.TimeframeLabelLevels.setText(_translate("MainWindow", "Timeframe"))
-        self.TimeframeComboLevels.setStatusTip(_translate("MainWindow", "On what timeframe should data be resampled before calculating levels. Must be compatible with pandas resample function."))
+        self.TimeframeComboLevels.setStatusTip(
+            _translate(
+                "MainWindow",
+                "On what timeframe should data be resampled before calculating levels. Must be compatible with pandas resample function.",
+            )
+        )
         self.TimeframeComboLevels.setCurrentText(_translate("MainWindow", "3h"))
         self.TimeframeComboLevels.setItemText(0, _translate("MainWindow", "5min"))
         self.TimeframeComboLevels.setItemText(1, _translate("MainWindow", "15min"))
@@ -282,19 +355,37 @@ class Ui_MainWindow(object):
         self.TimeframeComboLevels.setItemText(7, _translate("MainWindow", "8h"))
         self.TimeframeComboLevels.setItemText(8, _translate("MainWindow", "1d"))
         self.TypeLabel.setText(_translate("MainWindow", "Type"))
-        self.TypeCombo.setStatusTip(_translate("MainWindow", "Raw type may overlap levels. Filtered removes overlaping levels based on spacing value."))
+        self.TypeCombo.setStatusTip(
+            _translate(
+                "MainWindow",
+                "Raw type may overlap levels. Filtered removes overlaping levels based on spacing value.",
+            )
+        )
         self.TypeCombo.setCurrentText(_translate("MainWindow", "filtered"))
         self.TypeCombo.setItemText(0, _translate("MainWindow", "filtered"))
         self.TypeCombo.setItemText(1, _translate("MainWindow", "raw"))
         self.ThicknessLabel.setText(_translate("MainWindow", "Thickness"))
-        self.ThicknessSpin.setStatusTip(_translate("MainWindow", "Increase space between upper and lower portion of supply/demand area (as % of price magnitude)"))
+        self.ThicknessSpin.setStatusTip(
+            _translate(
+                "MainWindow",
+                "Increase space between upper and lower portion of supply/demand area (as % of price magnitude)",
+            )
+        )
         self.SpacingLabel.setText(_translate("MainWindow", "Spacing"))
-        self.SpacingSpin.setStatusTip(_translate("MainWindow", "Increasing spacing will increase number of levels"))
-        self.ControlTabWidged.setTabText(self.ControlTabWidged.indexOf(self.LevelsTab), _translate("MainWindow", "Levels"))
+        self.SpacingSpin.setStatusTip(
+            _translate(
+                "MainWindow", "Increasing spacing will increase number of levels"
+            )
+        )
+        self.ControlTabWidged.setTabText(
+            self.ControlTabWidged.indexOf(self.LevelsTab),
+            _translate("MainWindow", "Levels"),
+        )
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
