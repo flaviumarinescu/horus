@@ -89,10 +89,13 @@ class HorusApp(qtw.QMainWindow):
         self.update()
 
         refresh = int(self.ui.RefreshSpin.value())
+
         if refresh:
             self.ui.LockUnlock.setChecked(True)
             self.freeze_form()
             fplt.timer_callback(self.update, refresh)
+        else:
+            fplt._clear_timers()
 
     def keyPressEvent(self, e):
         if e.key() == qtc.Qt.Key_Escape:
