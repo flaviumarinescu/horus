@@ -375,9 +375,7 @@ class HorusApp(qtw.QMainWindow):
                 fplt.plot(
                     x, len(x) * [row.end], ax=self.ax, color="#00fff966", width=4.5
                 )
-
             fplt.refresh()  # refresh autoscaling when all plots complete
-
         else:
             self.plots[0].update_data(df["open close high low".split()])
 
@@ -414,36 +412,6 @@ class HorusApp(qtw.QMainWindow):
                         self.plots[8].update_data(temp)
             except Exception as e:
                 print("Error", f"Error : {e}")
-
-        # my_list = [x.strftime("%Y-%m-%d %H:%M:%S") for x in df.index.to_list()]
-        # for indx, row in levels.iterrows():
-
-        #     if indx.strftime("%Y-%m-%d %H:%M:%S") in my_list:
-        #         x = df.index[my_list.index(indx.strftime("%Y-%m-%d %H:%M:%S")) :]
-        #     else:
-        #         x = df.index[
-        #             my_list.index(
-        #                 (
-        #                     df.loc[
-        #                         df.index.unique()[
-        #                             df.index.unique().get_loc(indx, method="nearest")
-        #                         ]
-        #                     ].name
-        #                 ).strftime("%Y-%m-%d %H:%M:%S")
-        #             ) :
-        #         ]
-
-        #     fplt.plot(
-        #         x,
-        #         len(x) * [row.start],
-        #         ax=self.ax,
-        #         color="#00fff966",
-        #         width=4.5,
-        #     )
-        #     fplt.plot(
-        #         x, len(x) * [row.end], ax=self.ax, color="#00fff966", width=4.5
-        #     )
-        #     # fplt.refresh()  # refresh autoscaling when all plots complete
 
     def customize_fplt(self):
         fplt.legend_border_color = "#000000dd"
