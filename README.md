@@ -12,11 +12,11 @@ Running example :
 ![alt text](https://github.com/flaviumarinescu/horus/blob/main/screen.jpg?raw=true)
 
 
-Steps to take in order to run telegram notifications:
+Steps to take in order to run telegram notifications:  
 
-    1) Install [docker and docker-compose] (https://docs.docker.com/compose/install/)
+    1) Install [docker and docker-compose](https://docs.docker.com/compose/install/)
 
-    2) Get Telegram chat_id and bot token from [@BotFather] (https://core.telegram.org/bots#botfather)
+    2) Get Telegram chat_id and bot token from [@BotFather](https://core.telegram.org/bots#botfather)
 
     3) Create settings.ini file inside main directory with following structure:
 
