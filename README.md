@@ -12,17 +12,20 @@ Running example :
 ![alt text](https://github.com/flaviumarinescu/horus/blob/main/screen.jpg?raw=true)
 
 
-To run telegram notifications (docker and docker-compose needed):
-    1) Create settings.ini file inside main directory with following structure
+Steps to take in order to run telegram notifications:
+    1) Install [docker and docker-compose] (https://docs.docker.com/compose/install/)
+
+    2) Get Telegram chat_id and bot token from [@BotFather] (https://core.telegram.org/bots#botfather)
+
+    3) Create settings.ini file inside main directory with following structure
 ```
         [settings]
         CHAT_ID=<chat_id>
         TELEGRAM_TOKEN=<token>
 ```
-        [get id and token from @BotFather](https://core.telegram.org/bots#botfather)
-
-    2) Run
+    4) Run
 ```
         $ docker-compose up
 ```
-Tested with python version 3.7.4
+
+Tested with python version 3.7.4 & 3.9
