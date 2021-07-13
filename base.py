@@ -4,32 +4,13 @@
 import pandas as pd
 from pandas.core.base import PandasObject
 from datetime import datetime, timedelta
-from typing import List, Dict, Union
-from icecream import ic as print
+from typing import Dict, Union
 import yfinance as yf
+import os
 import numpy as np
-
-try:
-    from talib import (
-        CDLHAMMER,
-        CDLHANGINGMAN,
-        CDLENGULFING,
-        CDLDARKCLOUDCOVER,
-        CDLPIERCING,
-        CDLHARAMI,
-        CDLHARAMICROSS,
-        CDLEVENINGSTAR,
-        CDLMORNINGSTAR,
-        CDLEVENINGDOJISTAR,
-        CDLMORNINGDOJISTAR,
-        CDLGRAVESTONEDOJI,
-        CDLLONGLEGGEDDOJI,
-        CDLSPINNINGTOP,
-        CDLHIGHWAVE,
-        CDLDOJI,
-    )
-except Exception as e:
-    print(f"Talib not found, do not call candles function : {e}")
+import pickle
+from abc import ABC, abstractmethod
+import redis
 
 
 yf_params = {
@@ -44,7 +25,7 @@ yf_params = {
 }
 
 strategy_params = {
-    "contexts": ["2h", "4h"],
+    "contexts": {"medium": "2h", "long": "4h"},
 }
 
 level_params = {
@@ -54,6 +35,145 @@ level_params = {
     "timeframe": "2h",
     "period": 15,
 }
+
+redis_params = {"host": "redis", "db": 1, "charset": "utf-8", "port": 6379}
+
+
+class Analysis(ABC):
+    @staticmethod
+    @abstractmethod
+    def analysis(*args, **kwargs) -> pd.DataFrame:
+        pass
+
+
+class Technical(Analysis):
+    def analysis(df: pd.DataFrame, contexts: dict, tol: float = 0.005) -> pd.DataFrame:
+        df = df.copy()
+        tol = (df.high.max() - df.low.min()) * tol
+
+        df.loc[(df.close < df["sma_interval"]), "interval_position"] = -1
+        df.loc[(df.close > df["sma_interval"]), "interval_position"] = 1
+        df.loc[
+            ((df.low - tol) <= df["sma_interval"])
+            & ((df.high + tol) >= df["sma_interval"]),
+            "interval_position",
+        ] = 0
+
+        if contexts["long"] != "off":
+            df.loc[(df.close < df[f"sma_{contexts['long']}"]), "long_position"] = -1
+            df.loc[(df.close > df[f"sma_{contexts['long']}"]), "long_position"] = 1
+            df.loc[
+                ((df.low - tol) <= df[f"sma_{contexts['long']}"])
+                & ((df.high + tol) >= df[f"sma_{contexts['long']}"]),
+                "long_position",
+            ] = 0
+
+        if contexts["medium"] != "off":
+            df.loc[(df.close < df[f"sma_{contexts['medium']}"]), "medium_position"] = -1
+            df.loc[(df.close > df[f"sma_{contexts['medium']}"]), "medium_position"] = 1
+            df.loc[
+                ((df.low - tol) <= df[f"sma_{contexts['medium']}"])
+                & ((df.high + tol) >= df[f"sma_{contexts['medium']}"]),
+                "medium_position",
+            ] = 0
+
+        df.loc[(df.close < df["sma_fast"]), "fast_position"] = -1
+        df.loc[(df.close > df["sma_fast"]), "fast_position"] = 1
+        df.loc[
+            ((df.low - tol / 2) <= df["sma_fast"])
+            & ((df.high + tol / 2) >= df["sma_fast"]),
+            "fast_position",
+        ] = 0
+
+        return df
+
+
+class Candle(Analysis):
+    def analysis(
+        df: pd.DataFrame,
+        percentiles: dict = {
+            "small_body": 20,
+            "big_body": 90,
+            "long_wick": 90,
+        },
+    ) -> pd.DataFrame:
+        df = df.copy()
+
+        df["up"] = df.open > df.close
+        df["body"] = abs(df.close - df.open)
+        df["up_wick"] = 0.0
+        df["up_wick"].where(df.up == True, df.high - df.close, inplace=True)
+
+        df["up_wick"].where(df.up == False, df.high - df.open, inplace=True)
+        df["down_wick"] = 0.0
+        df["down_wick"].where(df.up == True, df.open - df.low, inplace=True)
+        df["down_wick"].where(df.up == False, df.close - df.low, inplace=True)
+
+        series = []
+        for index, row in df.iterrows():
+            tmp = []
+            if df.loc[index]["down_wick"] > np.percentile(
+                df["down_wick"], percentiles["long_wick"]
+            ):
+                tmp.append("long down wick")
+
+            if df.loc[index]["up_wick"] > np.percentile(
+                df["up_wick"], percentiles["long_wick"]
+            ):
+                tmp.append("long up wick")
+
+            if df.loc[index]["body"] > np.percentile(
+                df["body"], percentiles["big_body"]
+            ):
+                tmp.append("big body")
+
+            if df.loc[index]["body"] < np.percentile(
+                df["body"], percentiles["small_body"]
+            ):
+                tmp.append("small body")
+
+            tmp = ", ".join(tmp)
+
+            series.append(tmp)
+
+        df["candle"] = series
+        return df[["candle"]]
+
+
+class Cache:
+    def __init__(self):
+        if not os.path.exists("myconfig"):
+            self.data = {}
+            with open("myconfig", "wb") as file:
+                pickle.dump(self.data, file)
+        else:
+            with open("myconfig", "rb") as file:
+                self.data = pickle.load(file)
+
+    def load(self, ticker: str):
+        return self.data.get(ticker, None)
+
+    def save(self, data) -> None:
+        self.data.update(data)
+        with open("myconfig", "wb") as file:
+            pickle.dump(self.data, file)
+
+    def remove(self, ticker: str) -> None:
+        del self.data[ticker]
+        with open("myconfig", "wb") as handle:
+            pickle.dump(self.data, handle)
+
+
+class RedisConnection(object):
+    def __init__(self, **kwargs):
+        self.redis = redis.Redis(**kwargs)
+        self.redis.ping()  # will raise ConnectionError if redis not found
+
+    def __enter__(self):
+        return self.redis
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        del self.redis
 
 
 def clean(df: pd.DataFrame, dropna: str = "any") -> pd.DataFrame:
@@ -115,87 +235,26 @@ def change_context(df: pd.DataFrame, timeframe: str) -> pd.DataFrame:
     return df
 
 
-def strategy89(df: pd.DataFrame, contexts: List[str]) -> pd.DataFrame:
+def strategy89(df: pd.DataFrame, contexts: dict) -> pd.DataFrame:
     """
     Adds strategy data to dataframe
     """
-    for context in contexts:
-        sma = (
-            df["close"]
-            .change_context(timeframe=context)["close"]
-            .rolling(window=89)
-            .mean()
-        )
-        sma.name = f"sma_{context}"
-        df = pd.merge(df, sma, how="left", left_index=True, right_index=True)
-        df[sma.name].fillna(method="ffill", inplace=True)
+    for context in list(contexts.values()):
+        if context != "off":
+            sma = (
+                df.change_context(timeframe=context)["close"].rolling(window=89).mean()
+            )
+            sma.name = f"sma_{context}"
+            df = pd.merge(df, sma, how="left", left_index=True, right_index=True)
+            df[sma.name].fillna(method="ffill", inplace=True)
 
     df["sma_interval"] = df.close.rolling(window=89).mean()
-    df["sma_9"] = df.close.rolling(window=9).mean()
+    df["sma_fast"] = df.close.rolling(window=9).mean()
 
     if not df.empty:
         return df
     else:
         raise Exception("Not enough data to generate strategy paramenters")
-
-
-def candles(df: pd.DataFrame) -> pd.DataFrame:
-    CANDLESTICK_PATTERNS = {
-        "hammer": {"check": CDLHAMMER, "meaning": "trend reversal / bullish"},
-        "hanging_man": {"check": CDLHANGINGMAN, "meaning": "trend reversal / bearish"},
-        "engulfing": {"check": CDLENGULFING, "meaning": "trend reversal"},
-        "dark_cloud": {"check": CDLDARKCLOUDCOVER, "meaning": "bearish"},
-        "piercing": {"check": CDLPIERCING, "meaning": "bullish"},
-        "harami": {"check": CDLHARAMI, "meaning": "trend exhaustion"},
-        "harami_cross": {"check": CDLHARAMICROSS, "meaning": "trend exhaustion"},
-        "evening_star": {"check": CDLEVENINGSTAR, "meaning": "bearish"},
-        "evening_doji_star": {"check": CDLEVENINGDOJISTAR, "meaning": "bearish"},
-        "morning_star": {"check": CDLMORNINGSTAR, "meaning": "bullish"},
-        "morning_doji_star": {"check": CDLMORNINGDOJISTAR, "meaning": "bullish"},
-        "long_legged_doji": {
-            "check": CDLLONGLEGGEDDOJI,
-            "meaning": "trend reversal / indecision",
-        },
-        "gravestone": {
-            "check": CDLGRAVESTONEDOJI,
-            "meaning": "trend reversal / indecision",
-        },
-        "spinning_tops": {
-            "check": CDLSPINNINGTOP,
-            "meaning": "trend reversal / indecision",
-        },
-        "high_wave": {"check": CDLHIGHWAVE, "meaning": "trend reversal / indecision"},
-        "doji": {"check": CDLDOJI, "meaning": "trend reversal / indecision"},
-    }
-
-    df_patterns, patterns = (
-        pd.DataFrame(
-            {
-                each: list(
-                    CANDLESTICK_PATTERNS[each]["check"](
-                        df["open"], df["high"], df["low"], df["close"]
-                    )
-                )
-                for each in CANDLESTICK_PATTERNS
-            },
-            index=df.index,
-        ),
-        {each: CANDLESTICK_PATTERNS[each]["meaning"] for each in CANDLESTICK_PATTERNS},
-    )
-
-    data = {"Datetime": [], "patterns": []}
-    for index, row in df_patterns.iterrows():
-        if row.any():
-            data["Datetime"].append(index)
-            temp = ""
-            for pattern in df_patterns[-1:].columns:
-                if row[f"{pattern}"]:
-                    temp += (
-                        f"{pattern}({row[F'{pattern}']})  {patterns[F'{pattern}']}, "
-                    )
-            data["patterns"].append(temp)
-
-    return pd.DataFrame.from_dict(data).set_index("Datetime")
 
 
 def find_levels(

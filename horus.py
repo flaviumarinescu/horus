@@ -5,14 +5,10 @@ from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
 from MainWindow import Ui_MainWindow  # type: ignore
 from PyQt5.QtGui import QIcon
-
 import finplot as fplt
-import pickle
-from typing import Dict, Union
-import os
+from typing import Dict
 from datetime import datetime, timedelta
-from base import stock_data  # type: ignore
-from icecream import ic as print
+from base import stock_data, yf_params, redis_params, Cache
 
 
 class HorusApp(qtw.QMainWindow):
@@ -24,8 +20,8 @@ class HorusApp(qtw.QMainWindow):
         self.setWindowTitle("Horus")
         self.setWindowIcon(QIcon("logo.jpg"))
 
-        self.myconfig = Config()
-        self.yf_params = {}
+        self.myconfig = Cache()
+        self.yf_params = yf_params
         self.strategy_params = {}
         self.level_params = {}
 
@@ -157,24 +153,21 @@ class HorusApp(qtw.QMainWindow):
     def process_form(self, ticker: str) -> None:
         data = self.extract_form_data()[ticker]
         self.yf_params = {
-            "tickers": ticker,
-            "start": datetime.now() - timedelta(days=data["context"]["period"]),
-            "end": datetime.now(),
-            "interval": data["context"]["timeframe"],
-            "rounding": False,
-            "prepost": False,
-            "progress": False,
-            "group_by": "ticker",
+            **self.yf_params,
+            **{
+                "tickers": ticker,
+                "start": datetime.now() - timedelta(days=data["context"]["period"]),
+                "end": datetime.now(),
+                "interval": data["context"]["timeframe"],
+            },
         }
 
         self.strategy_params = {
-            "contexts": [],
+            "contexts": {
+                "medium": data["context"]["medium"],
+                "long": data["context"]["long"],
+            },
         }
-
-        if data["context"]["medium"] != "off":
-            self.strategy_params["contexts"].append(data["context"]["medium"])
-        if data["context"]["long"] != "off":
-            self.strategy_params["contexts"].append(data["context"]["long"])
 
         self.level_params = {
             "thickness": data["levels"]["thickness"],
@@ -231,7 +224,7 @@ class HorusApp(qtw.QMainWindow):
             # fast +  # plots[1]
             self.plots.append(
                 fplt.plot(
-                    df[df.close >= df.sma_9].sma_9,
+                    df[df.close >= df.sma_fast].sma_fast,
                     ax=self.ax,
                     legend="fast",
                     width=1,
@@ -241,7 +234,10 @@ class HorusApp(qtw.QMainWindow):
             # fast -  # plots[2]
             self.plots.append(
                 fplt.plot(
-                    df[df.close < df.sma_9].sma_9, ax=self.ax, width=1, color="#d00000"
+                    df[df.close < df.sma_fast].sma_fast,
+                    ax=self.ax,
+                    width=1,
+                    color="#d00000",
                 )
             )
 
@@ -266,10 +262,10 @@ class HorusApp(qtw.QMainWindow):
             )
 
             try:
-                if len(contexts):
+                if not contexts["medium"] == "off":
                     # medium +  # plots[5]
-                    temp = df[df.close >= df[f"sma_{contexts[0]}"]][
-                        f"sma_{contexts[0]}"
+                    temp = df[df.close >= df[f"sma_{contexts['medium']}"]][
+                        f"sma_{contexts['medium']}"
                     ]
                     if not temp.empty:
                         self.plots.append(
@@ -283,7 +279,9 @@ class HorusApp(qtw.QMainWindow):
                             )
                         )
                     # medium -  # plots[6]
-                    temp = df[df.close < df[f"sma_{contexts[0]}"]][f"sma_{contexts[0]}"]
+                    temp = df[df.close < df[f"sma_{contexts['medium']}"]][
+                        f"sma_{contexts['medium']}"
+                    ]
                     if not temp.empty:
                         self.plots.append(
                             fplt.plot(
@@ -306,10 +304,10 @@ class HorusApp(qtw.QMainWindow):
                 self.dialog = qtw.QMessageBox.critical(self, "Error", f"Error : {e}")
 
             try:
-                if len(contexts) == 2:
+                if not contexts["long"] == "off":
                     # long +  # plots[7]
-                    temp = df[df.close >= df[f"sma_{contexts[1]}"]][
-                        f"sma_{contexts[1]}"
+                    temp = df[df.close >= df[f"sma_{contexts['long']}"]][
+                        f"sma_{contexts['long']}"
                     ]
                     if not temp.empty:
                         self.plots.append(
@@ -323,7 +321,9 @@ class HorusApp(qtw.QMainWindow):
                             )
                         )
                     # long   # plots[8]
-                    temp = df[df.close < df[f"sma_{contexts[1]}"]][f"sma_{contexts[1]}"]
+                    temp = df[df.close < df[f"sma_{contexts['long']}"]][
+                        f"sma_{contexts['long']}"
+                    ]
                     if not temp.empty:
                         self.plots.append(
                             fplt.plot(
@@ -379,35 +379,39 @@ class HorusApp(qtw.QMainWindow):
         else:
             self.plots[0].update_data(df["open close high low".split()])
 
-            self.plots[1].update_data(df[df.close >= df.sma_9].sma_9)
+            self.plots[1].update_data(df[df.close >= df.sma_fast].sma_fast)
 
-            self.plots[2].update_data(df[df.close < df.sma_9].sma_9)
+            self.plots[2].update_data(df[df.close < df.sma_fast].sma_fast)
 
             self.plots[3].update_data(df[df.close >= df.sma_interval].sma_interval)
 
             self.plots[4].update_data(df[df.close < df.sma_interval].sma_interval)
 
             try:
-                if len(contexts):
-                    temp = df[df.close >= df[f"sma_{contexts[0]}"]][
-                        f"sma_{contexts[0]}"
+                if not contexts["medium"] == "off":
+                    temp = df[df.close >= df[f"sma_{contexts['medium']}"]][
+                        f"sma_{contexts['medium']}"
                     ]
                     if not temp.empty:
                         self.plots[5].update_data(temp)
-                    temp = df[df.close < df[f"sma_{contexts[0]}"]][f"sma_{contexts[0]}"]
+                    temp = df[df.close < df[f"sma_{contexts['medium']}"]][
+                        f"sma_{contexts['medium']}"
+                    ]
                     if not temp.empty:
                         self.plots[6].update_data(temp)
             except Exception as e:
                 print("Error", f"Error : {e}")
 
             try:
-                if len(contexts) == 2:
-                    temp = df[df.close >= df[f"sma_{contexts[1]}"]][
-                        f"sma_{contexts[1]}"
+                if not contexts["long"] == "off":
+                    temp = df[df.close >= df[f"sma_{contexts['long']}"]][
+                        f"sma_{contexts['long']}"
                     ]
                     if not temp.empty:
                         self.plots[7].update_data(temp)
-                    temp = df[df.close < df[f"sma_{contexts[1]}"]][f"sma_{contexts[1]}"]
+                    temp = df[df.close < df[f"sma_{contexts['long']}"]][
+                        f"sma_{contexts['long']}"
+                    ]
                     if not temp.empty:
                         self.plots[8].update_data(temp)
             except Exception as e:
@@ -429,31 +433,7 @@ class HorusApp(qtw.QMainWindow):
         fplt.significant_eps = 1e-5
 
 
-class Config:
-    def __init__(self):
-        if not os.path.exists("myconfig"):
-            self.data = {}
-            with open("myconfig", "wb") as file:
-                pickle.dump(self.data, file)
-        else:
-            with open("myconfig", "rb") as file:
-                self.data = pickle.load(file)
-
-    def load(self, ticker: str) -> Union[Dict, None]:
-        return self.data.get(ticker, None)
-
-    def save(self, data: Dict) -> None:
-        self.data.update(data)
-        with open("myconfig", "wb") as file:
-            pickle.dump(self.data, file)
-
-    def remove(self, ticker: str) -> None:
-        del self.data[ticker]
-        with open("myconfig", "wb") as handle:
-            pickle.dump(self.data, handle)
-
-
-def apply_style(app):
+def apply_style(app: qtw.QApplication) -> qtw.QApplication:
     from PyQt5.QtGui import QPalette, QColor
     from PyQt5.QtCore import Qt
 
@@ -485,7 +465,9 @@ def apply_style(app):
 
 if __name__ == "__main__":
     import sys
+    import os
 
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     app = qtw.QApplication(sys.argv)
     app = apply_style(app)
     window = HorusApp()
