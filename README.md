@@ -21,7 +21,9 @@ Steps to take in order to run telegram notifications:
         CHAT_ID=<chat_id>
         TELEGRAM_TOKEN=<token>
 ```
+
     4) Run  
+
 ```
         $ docker-compose up
 ```
