@@ -13,15 +13,15 @@ Running example :
 
 
 Steps to take in order to run telegram notifications:  
-    1) Install [docker and docker-compose](https://docs.docker.com/compose/install/)
-    2) Get Telegram chat_id and bot token from [@BotFather](https://core.telegram.org/bots#botfather)
-    3) Create settings.ini file inside main directory with following structure:
+    1) Install [docker and docker-compose](https://docs.docker.com/compose/install/)  
+    2) Get Telegram chat_id and bot token from [@BotFather](https://core.telegram.org/bots#botfather)  
+    3) Create settings.ini file inside main directory with following structure:  
 ```
         [settings]
         CHAT_ID=<chat_id>
         TELEGRAM_TOKEN=<token>
 ```
-    4) Run
+    4) Run  
 ```
         $ docker-compose up
 ```
