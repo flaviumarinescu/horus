@@ -7,6 +7,7 @@ Since data is gathered using yfinance, Ticker input must be in yahoo finance sty
 
 Running example :
 ```
+    $ pip install -r container/requirements.txt   
     $ python horus.py
 ```
 ![alt text](https://github.com/flaviumarinescu/horus/blob/main/screen.jpg?raw=true)
@@ -15,7 +16,7 @@ Running example :
 Steps to take in order to run telegram notifications:  
 1) Install [docker and docker-compose](https://docs.docker.com/compose/install/)  
 2) Get Telegram chat_id and bot token from [@BotFather](https://core.telegram.org/bots#botfather)  
-3) Create settings.ini file inside main directory with following structure:  
+3) Create settings.ini file inside container directory with following structure:  
 ```
         [settings]
         CHAT_ID=<chat_id>
