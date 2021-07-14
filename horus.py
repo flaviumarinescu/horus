@@ -8,7 +8,7 @@ from PyQt5.QtGui import QIcon
 import finplot as fplt
 from typing import Dict
 from datetime import datetime, timedelta
-from base import stock_data, yf_params, redis_params, Cache
+from container.base import stock_data, yf_params, redis_params, Cache
 
 
 class HorusApp(qtw.QMainWindow):
